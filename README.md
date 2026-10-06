@@ -17,15 +17,24 @@ Open <http://127.0.0.1:3000>. The included VS Code **Start OpenAIBOM** task uses
 PORT=3001 npm start
 ```
 
-Select a project folder in a directory-selection-capable browser, or run the risky/fixed offline demo. Inspect policy decisions, evidence, remediation guidance, and relationships. Save the current report as a baseline or import a previously exported v0.2.0 report for the same project name. Review state and baseline live in browser memory until exported; checkbox review does not waive a policy finding.
+Start with **Analyze risky sample**, then **Compare fixed sample**—no upload is needed. To scan a project in a directory-selection-capable browser, expand **Scan your own project** and read the privacy notice; hosted uploads require consent. Its **Comparison baseline** section lets you save the current report or import a previously exported v0.2.0 report for the same project name, even before the first scan. Review state and baseline live in browser memory until exported; checkbox review does not waive a policy finding.
+
+The dashboard separates the report into four keyboard-accessible tabs:
+
+- **Findings & actions:** blocker-first cards explain the issue, source location and recommended action; expand evidence details for confidence and rule IDs.
+- **Component inventory:** search, filter and mark components as manually reviewed.
+- **Changes:** compare counts, expand individual changes and manage the baseline.
+- **Evidence & graph:** inspect references, fingerprints, coverage and limitations.
+
+The policy card explains the decision and next step. Request/import errors appear in a highlighted status card; a failed scan leaves the previous report visible and explicitly identified as such. Expand the benchmark section below the report to inspect fixture-only validation.
 
 ## Hackathon demo
 
 1. Run the **risky** sample: a model is unpinned, remote code is enabled, a loader disables restricted deserialization, and a fictional locked package matches a synthetic advisory.
-2. Show the failing policy, separate severity/confidence, and exact source lines. Nothing in the sample is executed or downloaded.
-3. Inspect the observed graph and project impact. There is no invented model-to-training-dataset lineage.
-4. Run the **fixed** sample against the automatically retained baseline. Show resolved policy findings and changed component revisions. Missing licenses still require review; do not call the project universally safe.
-5. Run the benchmark. Show positive/negative cases and fixture-only precision/recall—not a marketing claim about real-world accuracy.
+2. Show **Changes required** and the highlighted finding cards. Open evidence details to distinguish severity from confidence and inspect exact source lines. Nothing in the sample is executed or downloaded.
+3. Open **Evidence & graph** to inspect observed references and project impact. There is no invented model-to-training-dataset lineage.
+4. Run **Compare fixed sample** against the automatically retained baseline. Open **Changes** to inspect resolved policy findings and changed component revisions. The fixed sample says **Manual review needed**: missing licenses still require review; do not call the project universally safe.
+5. Expand the benchmark section and run it. Show positive/negative cases and fixture-only precision/recall—not a marketing claim about real-world accuracy.
 6. Export the inventory, evidence hashes, findings, graph, policy result, review state, and diff.
 
 ## Presentation

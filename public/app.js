@@ -25,8 +25,36 @@ function element(tag, text, className) {
   return node;
 }
 function status(text, error = false) {
-  $('status').textContent = text;
+  const pending = !error && /^(Scanning|Loading)/.test(text);
+  $('status-message').textContent = text;
+  $('status-title').textContent = error ? 'Action could not be completed' : pending ? 'Analysis in progress' : 'Workspace ready';
+  $('status-icon').textContent = error ? '!' : pending ? '↻' : '✓';
   $('status').classList.toggle('error', error);
+  $('status').classList.toggle('pending', pending);
+  if (error) $('status').scrollIntoView({ block: 'center' });
+}
+function selectView(name, focus = false) {
+  for (const tab of document.querySelectorAll('[data-view]')) {
+    const selected = tab.dataset.view === name;
+    tab.setAttribute('aria-selected', String(selected));
+    tab.tabIndex = selected ? 0 : -1;
+    $(tab.getAttribute('aria-controls')).hidden = !selected;
+    if (selected && focus) tab.focus();
+  }
+}
+const reportTabs = [...document.querySelectorAll('[data-view]')];
+for (const [index, tab] of reportTabs.entries()) {
+  tab.addEventListener('click', () => selectView(tab.dataset.view));
+  tab.addEventListener('keydown', event => {
+    let next;
+    if (event.key === 'ArrowRight') next = (index + 1) % reportTabs.length;
+    if (event.key === 'ArrowLeft') next = (index + reportTabs.length - 1) % reportTabs.length;
+    if (event.key === 'Home') next = 0;
+    if (event.key === 'End') next = reportTabs.length - 1;
+    if (next === undefined) return;
+    event.preventDefault();
+    selectView(reportTabs[next].dataset.view, true);
+  });
 }
 function setBusy(value) {
   busy = value;
@@ -64,7 +92,7 @@ async function loadConfig() {
       throw new Error('The server returned an invalid privacy or limits configuration.');
     }
     config = value;
-    $('hosting-badge').textContent = isPublic() ? 'Hosted mode · Source uploads' : 'Local mode · Local analysis';
+    $('hosting-badge').textContent = isPublic() ? 'Hosted demo' : 'Local workspace';
     $('privacy-notice').textContent = isPublic()
       ? 'Selected supported source contents are sent over HTTPS to the hosted server, processed in memory, and not executed or intentionally stored/logged by the application. The hosting provider may retain request metadata. Do not upload secrets, personal information, or confidential source. JSON exports contain evidence paths and project metadata; review before sharing.'
       : 'Supported source contents are sent to this local server for analysis, processed in memory, and not executed or intentionally stored/logged by the application. No source is sent to a cloud service by this application in local mode. Do not select secrets, personal information, or confidential source. JSON exports contain evidence paths and project metadata; review before sharing.';
@@ -168,7 +196,7 @@ function renderPolicy() {
       selectionAdjustment: 'Browser selection omitted files. Review is required unless engine checks already fail; the engine result applies only to submitted files.'
     };
   }
-  $('policy-status').textContent = { pass: 'Pass', fail: 'Fail', review: 'Needs review' }[decision];
+  $('policy-status').textContent = { pass: 'Configured checks passed', fail: 'Changes required', review: 'Manual review needed' }[decision];
   $('policy-status').closest('section').className = `policy-panel ${decision}`;
   const descriptions = { pass: 'No policy blockers reported by the configured checks.', fail: 'Configured checks found blocking issues. Inspect the evidence and remediation below.', review: 'Manual review is required before drawing conclusions.' };
   $('policy-description').textContent = partial
@@ -178,31 +206,65 @@ function renderPolicy() {
   $('policy-rules').replaceChildren(...(rules.length ? rules : ['No policy rules provided by this engine.']).map(rule => element('li', describe(rule))));
   const blockers = list(policy?.blockingFindings);
   $('policy-blockers').textContent = blockers.length ? `${blockers.length} policy blocker(s): ${blockers.join(', ')}` : 'No blocking finding identifiers reported.';
+  $('policy-next-title').textContent = decision === 'fail' ? 'Start with the blocking findings' : decision === 'review' ? 'A person still needs to review this' : 'Keep the evidence with your release';
+  $('policy-next-action').textContent = decision === 'fail'
+    ? `${blockers.length ? `${blockers.length} blocking finding(s) reported. ` : ''}Follow the action on each highlighted card, then scan again to compare the result.`
+    : decision === 'review' ? 'Check missing metadata and coverage gaps below. No approval is implied by the absence of blocking findings.'
+      : 'Export this report for your records. Passing the configured checks is not a security or compliance guarantee.';
 }
+const findingTitles = {
+  REMOTE_CODE_ENABLED: 'Remote code is allowed to run',
+  UNSAFE_DESERIALIZATION: 'The loader allows general object deserialization',
+  MODEL_UNPINNED: 'Model version is not pinned',
+  FIXTURE_ADVISORY_MATCH: 'Demo dependency matches a synthetic advisory',
+  LICENSE_UNKNOWN: 'License information is missing',
+  PARSE_ERROR: 'This source file could not be analyzed',
+  INVALID_MANIFEST: 'The dependency manifest could not be read',
+  INVALID_LOCKFILE: 'The lockfile could not be read',
+  UNSUPPORTED_LOCKFILE: 'This lockfile format is not supported',
+  UNSUPPORTED_MANIFEST: 'This manifest format needs manual review',
+  UNSUPPORTED_REQUIREMENT: 'A dependency declaration needs review',
+  LOCK_ENTRY_UNRESOLVED: 'The locked version could not be resolved',
+  DYNAMIC_REFERENCE: 'A model or dataset reference could not be resolved',
+  REVISION_UNRESOLVED: 'Model revision could not be resolved',
+  REMOTE_CODE_UNRESOLVED: 'Remote-code permissions need review',
+  LOADER_SAFETY_UNRESOLVED: 'Loader safety settings need review',
+  LOCAL_MODEL_PROVENANCE_UNKNOWN: 'Local model origin is not established',
+  NO_MODEL_REFERENCE: 'No supported model reference was found'
+};
 function renderFindings() {
   if (!currentReport) return;
   const severity = $('severity').value;
-  const findings = currentReport.findings.filter(finding => severity === 'all' || finding.severity === severity);
-  $('finding-count').textContent = `${findings.length} / ${currentReport.findings.length}`;
-  $('findings').replaceChildren();
   const blockers = list(currentReport.analysis?.policy?.blockingFindings);
+  const isBlocking = finding => Boolean(finding.blocking || (finding.id && blockers.includes(finding.id)));
+  const priority = { high: 0, medium: 1, warning: 2, info: 3 };
+  const findings = currentReport.findings.filter(finding => severity === 'all' || finding.severity === severity)
+    .sort((a, b) => Number(isBlocking(b)) - Number(isBlocking(a)) || (priority[a.severity] ?? 4) - (priority[b.severity] ?? 4));
+  $('finding-count').textContent = `${findings.length} of ${currentReport.findings.length} findings`;
+  $('tab-finding-count').textContent = String(currentReport.findings.length);
+  $('findings').replaceChildren();
   for (const finding of findings) {
-    const item = element('li', undefined, 'finding');
-    const tags = element('div', undefined, 'finding-tags');
     const level = ['high', 'medium', 'warning', 'info'].includes(finding.severity) ? finding.severity : 'unknown';
-    tags.append(element('span', level.toUpperCase(), `pill severity-${level}`));
-    if (finding.blocking || (finding.id && blockers.includes(finding.id))) tags.append(element('span', 'POLICY BLOCKER', 'pill blocking'));
-    if (finding.category) tags.append(element('span', describe(finding.category), 'pill'));
-    item.append(tags, element('h4', String(finding.code || 'Finding').replaceAll('_', ' ')), element('p', finding.message || 'No description provided.'));
-    const metadata = element('p', `Confidence: ${describe(finding.confidence)} · ${sourceLocation(finding)}`, 'evidence');
-    item.append(metadata);
-    if (finding.componentId) item.append(element('p', `Component: ${finding.componentId}`, 'evidence'));
+    const item = element('li', undefined, `finding level-${level}${isBlocking(finding) ? ' is-blocking' : ''}`);
+    const tags = element('div', undefined, 'finding-tags');
+    tags.append(element('span', level === 'info' ? 'INFORMATION' : level.toUpperCase(), `pill severity-${level}`));
+    if (isBlocking(finding)) tags.append(element('span', 'POLICY BLOCKER', 'pill blocking'));
+    if (finding.synthetic) tags.append(element('span', 'SYNTHETIC', 'pill synthetic'));
+    item.append(tags, element('h4', findingTitles[finding.code] || String(finding.code || 'Finding').replaceAll('_', ' ')), element('p', finding.message || 'No description provided.'));
+    const component = currentReport.components.find(value => value.id === finding.componentId);
+    const location = element('div', undefined, 'location');
+    location.append(element('span', 'SOURCE'), element('code', finding.path ? sourceLocation(finding) : component?.name ? `${component.name} · component metadata` : 'No source location supplied'));
+    item.append(location);
     const remediation = element('div', undefined, 'remediation');
-    remediation.append(element('strong', 'NEXT ACTION'), element('span', finding.remediation ? describe(finding.remediation) : 'No specific remediation supplied. Inspect the source evidence and document your review.'));
-    item.append(remediation);
+    remediation.append(element('strong', 'RECOMMENDED ACTION'), element('span', finding.remediation ? describe(finding.remediation) : finding.code === 'LICENSE_UNKNOWN' ? 'Verify the component’s upstream license and document the applicable terms before approving its use.' : 'No specific remediation supplied. Inspect the source evidence and document your review.'));
+    const technical = element('details');
+    technical.append(element('summary', `Evidence details · confidence: ${describe(finding.confidence)}`), element('p', `Rule: ${finding.code || 'Not provided'} · Category: ${describe(finding.category)}`, 'evidence'));
+    if (finding.componentId) technical.append(element('p', `Component: ${finding.componentId}`, 'evidence'));
+    technical.append(element('p', `Finding ID: ${finding.id || 'Not provided'}`, 'evidence'));
+    item.append(remediation, technical);
     $('findings').append(item);
   }
-  if (!findings.length) $('findings').append(element('li', currentReport.findings.length ? 'No findings match this severity.' : 'No findings reported by the supported checks. This is not a safety or compliance guarantee.', 'empty-state'));
+  if (!findings.length) $('findings').append(element('li', currentReport.findings.length ? 'No findings match this severity. Choose another severity to continue reviewing.' : 'No findings reported by the supported checks. This is not a safety or compliance guarantee.', 'empty-state'));
 }
 function renderFingerprints() {
   const digest = currentReport.inputDigest;
@@ -253,7 +315,9 @@ function renderDiff() {
         : `${entry.code || 'Finding'}: ${entry.message || entry.id || 'No description'}${entry.path ? ` (${sourceLocation(entry)})` : ''}`;
       items.append(element('li', text));
     }
-    card.append(title, entries.length ? items : element('p', 'None', 'hint'));
+    const details = element('details');
+    details.append(element('summary', 'Inspect changes'), items);
+    card.append(title, entries.length ? details : element('p', 'None', 'hint'));
     $('diff-content').append(card);
   }
 }
@@ -323,10 +387,13 @@ function renderGraph() {
 function renderReport() {
   $('report').hidden = false;
   $('welcome').hidden = true;
+  document.body.classList.add('has-report');
+  selectView('findings');
   $('report-title').textContent = projectName(currentReport);
   const timestamp = new Date(currentReport.generatedAt);
   $('report-meta').textContent = `${currentReport.project?.filesScanned ?? currentReport.analysis?.coverage?.filesAnalyzed ?? 'Unknown'} files scanned · ${currentReport.selection.skippedFiles} files skipped · ${Number.isNaN(timestamp.getTime()) ? 'Time not provided' : timestamp.toLocaleString()}`;
   $('sample-label').hidden = !currentReport.selection.sample;
+  $('sample-label').textContent = currentReport.selection.stage === 'fixed' ? 'FIXED SAMPLE · SYNTHETIC' : 'RISKY SAMPLE · SYNTHETIC';
   renderPolicy();
   renderStats('stats', [['model', 'Model candidates'], ['dataset', 'Dataset candidates'], ['dependency', 'Direct dependencies'], ['unknown', 'Unknown licenses']].map(([type, label]) => [currentReport.components.filter(component => type === 'unknown' ? !component.license : component.type === type).length, label]));
   $('filter').value = 'all';
@@ -373,6 +440,8 @@ async function scan(payload, selection, compareWith = baseline) {
   // Selection exclusions are coverage metadata, not engine findings: keep policy and diff identities consistent.
   renderReport();
   status(`${selection.sample ? 'Synthetic sample' : 'Project'} scan complete. ${selection.skippedFiles ? `${selection.skippedFiles} files skipped; see coverage. ` : ''}Review the evidence. Review changes persist only when exported.`);
+  $('report-title').focus({ preventScroll: true });
+  $('report').scrollIntoView({ block: 'start' });
 }
 function scanError(error) {
   status(`${error.message}${currentReport ? ' The previous report is still displayed.' : ''}`, true);
@@ -425,6 +494,12 @@ async function runDemo(fixed) {
 }
 $('demo').addEventListener('click', () => runDemo(false));
 $('demo-fixed').addEventListener('click', () => runDemo(true));
+$('manage-baseline').addEventListener('click', () => {
+  $('project-upload').open = true;
+  $('baseline-settings').open = true;
+  $('baseline-settings').querySelector('summary').focus();
+  $('baseline-settings').scrollIntoView({ block: 'center' });
+});
 $('save-baseline').addEventListener('click', () => {
   if (busy || !currentReport) return;
   captureBaseline(currentReport, 'saved in memory');
