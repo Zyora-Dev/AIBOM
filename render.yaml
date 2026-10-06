@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: openaibom-demo
+    runtime: node
+    plan: free
+    buildCommand: npm ci && npm test && npm run check
+    startCommand: npm start
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_VERSION
+        value: "22"
+      - key: NODE_ENV
+        value: production
+      - key: HOSTING_MODE
+        value: public

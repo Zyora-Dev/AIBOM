@@ -1,0 +1,16 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Start OpenAIBOM",
+			"type": "shell",
+			"command": "npm",
+			"args": [
+				"start"
+			],
+			"options": { "env": { "PORT": "4317" } },
+			"isBackground": true,
+			"problemMatcher": []
+		}
+	]
+}

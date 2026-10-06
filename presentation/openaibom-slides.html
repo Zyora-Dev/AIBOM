@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>OpenAIBOM — Hackathon presentation</title>
+<style>
+:root{--ink:#152d36;--muted:#52676e;--teal:#087f78;--line:#d7e2df;--paper:#fff;--soft:#f3f7f5;--amber:#946016;--red:#a63c3c}
+*{box-sizing:border-box}body{margin:0;background:#e6ece9;color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.toolbar{max-width:1280px;margin:22px auto;display:flex;justify-content:space-between;align-items:center;padding:0 18px;font-size:14px;color:var(--muted)}button{border:0;border-radius:6px;background:var(--teal);color:white;padding:12px 18px;font:inherit;cursor:pointer}a{color:var(--teal)}
+.slide{position:relative;width:1280px;height:720px;margin:24px auto;padding:48px 64px 64px;background:var(--paper);overflow:hidden;break-after:page;box-shadow:0 6px 28px #152d3610}
+.top{display:flex;justify-content:space-between;align-items:center;color:var(--muted);font-size:13px;letter-spacing:1.4px;text-transform:uppercase;margin-bottom:30px}.brand{font-weight:800;color:var(--teal)}.eyebrow{font-size:14px;font-weight:700;letter-spacing:2px;color:var(--teal);text-transform:uppercase;margin:0 0 16px}
+h1{font-size:70px;line-height:1.04;letter-spacing:-3px;margin:0 0 22px;max-width:1000px}h2{font-size:42px;line-height:1.13;letter-spacing:-1.4px;margin:0 0 16px}h3{font-size:23px;line-height:1.25;margin:0 0 12px}p{font-size:20px;line-height:1.5;margin:0 0 18px}.lead{font-size:24px;line-height:1.45;color:var(--muted);max-width:1000px;margin-bottom:28px}.muted{color:var(--muted)}.small{font-size:16px;line-height:1.5}.grid{display:grid;gap:22px}.three{grid-template-columns:repeat(3,1fr)}.two{grid-template-columns:repeat(2,1fr)}.card{background:var(--soft);border:1px solid var(--line);border-radius:12px;padding:26px}.card p{font-size:18px;margin:0}.card h3{font-size:22px}.number{display:block;color:var(--teal);font-weight:750;font-size:15px;letter-spacing:1px;margin-bottom:18px}.band{margin-top:26px;border-left:4px solid var(--teal);background:var(--soft);padding:16px 22px;font-size:19px;line-height:1.45}.footer{position:absolute;bottom:24px;left:64px;right:64px;display:flex;justify-content:space-between;border-top:1px solid var(--line);padding-top:12px;font-size:12px;color:var(--muted)}
+.tags{display:flex;gap:10px;flex-wrap:wrap;margin-top:24px}.tag{font-size:14px;padding:8px 13px;border-radius:99px;border:1px solid var(--line);color:var(--teal);font-weight:650}.status{display:inline-block;font-size:14px;letter-spacing:.6px;text-transform:uppercase;font-weight:750;border-radius:5px;padding:7px 11px;margin-bottom:14px}.fail{background:#fbecec;color:var(--red)}.review{background:#fff2da;color:var(--amber)}.pass{background:#e3f4ed;color:#25654a}.flow{display:grid;grid-template-columns:repeat(5,1fr);gap:16px;margin-top:34px}.step{border-top:3px solid var(--teal);background:var(--soft);padding:22px 18px;min-height:218px}.step h3{font-size:20px}.step p{font-size:17px}.stack{display:grid;gap:16px}.row{display:grid;grid-template-columns:285px 1fr;gap:20px;align-items:start;border-bottom:1px solid var(--line);padding:16px 0}.row h3{font-size:20px;margin:0}.row p{font-size:18px;margin:0}.metric{font-size:62px;line-height:1.1;letter-spacing:-2px;color:var(--teal);font-weight:750;margin-bottom:12px}.list{list-style:none;padding:0;margin:0}.list li{font-size:19px;line-height:1.45;margin:0 0 15px;padding-left:20px;position:relative}.list li::before{content:'•';position:absolute;left:0;color:var(--teal)}.hero{background:#f3f7f5}.hero h1 em{font-style:normal;color:var(--teal)}.hero .top{margin-bottom:54px}.closing{font-size:56px;max-width:950px;margin-top:32px}.footnote{font-size:15px;line-height:1.45;color:var(--muted);margin-top:20px}code{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:.84em;background:#e9efec;padding:2px 5px;border-radius:3px}
+@media screen and (max-width:1312px){.slide{width:calc(100% - 32px);height:auto;min-height:720px}.toolbar{margin:16px}.flow{gap:10px}}
+@media screen and (max-width:850px){.slide{padding:30px 26px 78px;min-height:0}.three,.two,.flow{grid-template-columns:1fr}.row{grid-template-columns:1fr;gap:8px}h1{font-size:46px}h2{font-size:34px}.closing{font-size:40px}.lead{font-size:21px}.footer{left:26px;right:26px}.top{gap:12px;font-size:11px}.hero .top{margin-bottom:34px}.step{min-height:0}.toolbar{gap:14px}.toolbar span{max-width:65%}}
+@page{size:13.333333in 7.5in;margin:0}
+@media print{html,body{width:1280px;margin:0;background:white}.toolbar{display:none}.slide{width:1280px;height:720px;min-height:0;margin:0;box-shadow:none;break-inside:avoid;page-break-after:always}.slide:last-child{break-after:auto;page-break-after:auto}a{text-decoration:none}}
+</style>
+</head>
+<body>
+<nav class="toolbar" aria-label="Presentation controls"><span>12 slides · OpenAIBOM v0.2 · Print-ready 16:9</span><button type="button" onclick="window.print()">Print / Save as PDF</button></nav>
+<main>
+<section class="slide hero" aria-label="Slide 1: Introduction">
+<div class="top"><span class="brand">OpenAIBOM</span><span>Open-source hackathon prototype</span></div>
+<p class="eyebrow">AI Bill of Materials · v0.2</p>
+<h1>Know what is inside.<br><em>Show why it needs review.</em></h1>
+<p class="lead">An evidence-backed inventory and policy analyzer for AI projects.<br>Discover components. Explain findings. Track changes.</p>
+<div class="tags"><span class="tag">Offline analysis</span><span class="tag">No LLM dependency</span><span class="tag">MIT licensed</span></div>
+<div class="footer"><span>Evidence before confidence</span><span>01 / 12</span></div>
+</section>
+<section class="slide" aria-label="Slide 2: Problem and users">
+<div class="top"><span class="brand">OpenAIBOM</span><span>The problem</span></div>
+<h2>AI dependencies are more than packages.</h2>
+<p class="lead">Model references, loader settings and missing provenance can be scattered across a repository.</p>
+<div class="grid three">
+<div class="card"><span class="number">01 / VISIBILITY</span><h3>What do we depend on?</h3><p>Package declarations alone do not explain which model or dataset a source file references.</p></div>
+<div class="card"><span class="number">02 / REVIEW</span><h3>What needs attention?</h3><p>Mutable model references and permissive loading settings need traceable review—not a mystery score.</p></div>
+<div class="card"><span class="number">03 / CHANGE</span><h3>Did the update help?</h3><p>A release needs a comparison showing which findings appeared, disappeared or remain unresolved.</p></div>
+</div>
+<div class="band"><strong>Built for:</strong> AI developers, engineering reviewers and teams demonstrating responsible release practices.</div>
+<div class="footer"><span>Inventory supports review; it does not replace it</span><span>02 / 12</span></div>
+</section>
+<section class="slide" aria-label="Slide 3: Architecture">
+<div class="top"><span class="brand">OpenAIBOM</span><span>How it works</span></div>
+<h2>From source files to inspectable evidence.</h2>
+<p class="lead">A local browser interface and Node.js engine. Selected source is parsed—not executed.</p>
+<div class="flow">
+<div class="step"><span class="number">01 →</span><h3>Select</h3><p>A local project folder or bundled demo fixture.</p></div>
+<div class="step"><span class="number">02 →</span><h3>Parse</h3><p>Babel for JS/TS; Lezer for Python; supported package manifests.</p></div>
+<div class="step"><span class="number">03 →</span><h3>Inventory</h3><p>Component references, exact npm lock entries and file evidence.</p></div>
+<div class="step"><span class="number">04 →</span><h3>Assess</h3><p>Explicit rules, confidence, remediation and coverage gaps.</p></div>
+<div class="step"><span class="number">05</span><h3>Compare</h3><p>Baseline differences, observed graph, hashes and JSON export.</p></div>
+</div>
+<p class="footnote">Runtime scanning is offline. No model inference, API key, source execution or external advisory request is required.</p>
+<div class="footer"><span>Native Node HTTP · Browser ES modules · Syntax parsers</span><span>03 / 12</span></div>
+</section>
+<section class="slide" aria-label="Slide 4: Features">
+<div class="top"><span class="brand">OpenAIBOM</span><span>Implemented features</span></div>
+<h2>One workspace. Six practical capabilities.</h2>
+<p class="lead">Available in the working prototype today.</p>
+<div class="grid three">
+<div class="card"><h3>AI inventory</h3><p>Supported model and dataset references alongside npm and Python declarations.</p></div>
+<div class="card"><h3>Evidence-backed findings</h3><p>Rule, path, line, confidence and a recommended next action.</p></div>
+<div class="card"><h3>Observed graph</h3><p>Project, files and component references—not inferred training lineage.</p></div>
+<div class="card"><h3>Release comparison</h3><p>Added / removed components, introduced / resolved findings and changed files.</p></div>
+<div class="card"><h3>Input fingerprints</h3><p>Per-file SHA-256 hashes and a deterministic digest of selected inputs.</p></div>
+<div class="card"><h3>CLI + report export</h3><p>JSON reports, baseline scans and exit-code policy gates for CI.</p></div>
+</div>
+<div class="footer"><span>Custom OpenAIBOM report format v0.2.0</span><span>04 / 12</span></div>
+</section>
+<section class="slide" aria-label="Slide 5: Policy decisions">
+<div class="top"><span class="brand">OpenAIBOM</span><span>Explainable assessment</span></div>
+<h2>Clear decisions instead of an opaque score.</h2>
+<div class="grid three" style="margin-top:24px">
+<div class="card"><span class="status fail">Fail</span><h3>A blocking rule matched.</h3><p>Examples: an unpinned model or explicit permission to load remote code.</p></div>
+<div class="card"><span class="status review">Review</span><h3>Evidence is incomplete.</h3><p>Examples: dynamic options, unknown licenses, parse errors or missing local provenance.</p></div>
+<div class="card"><span class="status pass">Pass</span><h3>Supported checks passed.</h3><p>No blocking rule or review condition was found. This is not a safety guarantee.</p></div>
+</div>
+<div class="row"><h3>Configuration checks</h3><p>Model revision format; remote-code permissions; selected Python object-deserialization calls.</p></div>
+<div class="row"><h3>Synthetic advisory check</h3><p>Exact fictional npm package/version match. Demonstrates the mechanism, not live CVE coverage.</p></div>
+<p class="footnote">Severity and confidence are separate. A configuration finding is not proof of exploitation.</p>
+<div class="footer"><span>Every finding should support a concrete review action</span><span>05 / 12</span></div>
+</section>
+<section class="slide" aria-label="Slide 6: Innovation">
+<div class="top"><span class="brand">OpenAIBOM</span><span>Innovation in the prototype</span></div>
+<h2>The contribution is the evidence-to-change loop.</h2>
+<p class="lead">Not a claim to invent AIBOM. A focused combination that makes AI configuration review demonstrable.</p>
+<div class="grid three">
+<div class="card"><span class="number">STRUCTURED, NOT JUST TEXT</span><h3>Syntax-aware discovery</h3><p>Parses supported executable constructs and avoids treating comments or quoted examples as calls.</p></div>
+<div class="card"><span class="number">UNCERTAINTY IS VISIBLE</span><h3>Honest policy decisions</h3><p>Separates explicit violations from unresolved evidence instead of treating “not detected” as safe.</p></div>
+<div class="card"><span class="number">IMPROVEMENT IS INSPECTABLE</span><h3>Reproducible comparison</h3><p>Connects findings, observed references, input fingerprints and baseline changes in one report.</p></div>
+</div>
+<div class="band"><strong>Why it is not a wrapper:</strong> the core work is implemented in parsers, deterministic rules, report comparison and a hand-labelled benchmark—not delegated to an LLM.</div>
+<div class="footer"><span>Innovation through integration, transparency and testability</span><span>06 / 12</span></div>
+</section>
+<section class="slide" aria-label="Slide 7: Demo walkthrough">
+<div class="top"><span class="brand">OpenAIBOM</span><span>Live demo · approximately 2 minutes</span></div>
+<h2>Two bundled samples. A visible before and after.</h2>
+<p class="lead">The samples are included. Buttons load them on demand; nothing in the sample source is executed.</p>
+<div class="grid two">
+<div class="card"><span class="status fail">01 / Risky sample</span><ul class="list"><li>Unpinned model references.</li><li>Remote-code permission enabled.</li><li>Unrestricted loader configuration.</li><li>Fictional package matches a synthetic advisory.</li></ul></div>
+<div class="card"><span class="status review">02 / Fixed sample</span><ul class="list"><li>Literal revision pins and restrictive settings.</li><li>Fixture package version updated.</li><li><strong>Six blocking findings resolved</strong> in the demo comparison.</li><li>Unknown licenses still require review.</li></ul></div>
+</div>
+<div class="band"><strong>Present it:</strong> Run risky sample → inspect evidence and graph → run fixed sample → show the diff → run benchmark → export JSON.</div>
+<div class="footer"><span>All demonstration identifiers and advisory data are synthetic</span><span>07 / 12</span></div>
+</section>
+<section class="slide" aria-label="Slide 8: Validation">
+<div class="top"><span class="brand">OpenAIBOM</span><span>How the assessment is tested</span></div>
+<h2>Measured against explicit expected outcomes.</h2>
+<p class="lead">Snapshot of the verified prototype—not a claim about accuracy on unseen projects.</p>
+<div class="grid three">
+<div class="card"><div class="metric">52</div><h3>Automated tests passed</h3><p>Engine, inventory, benchmark, CLI, HTTP and public-hosting controls.</p></div>
+<div class="card"><div class="metric">43 / 43</div><h3>Labelled fixtures passed</h3><p>Positive and negative examples, including dynamic input and malformed syntax.</p></div>
+<div class="card"><div class="metric">40 / 0 / 0</div><h3>TP / FP / FN</h3><p>Matched rule + file path + line within the selected fixture rules.</p></div>
+</div>
+<div class="band"><strong>Ground truth is hand-labelled.</strong> Wrong evidence locations, duplicate detections and scan failures count against results.</div>
+<p class="footnote">The 43 cases run inside the benchmark tests; they are not an additional independent validation set. Synthetic advisory data only. No real-world generalization has been established.</p>
+<div class="footer"><span>Reproduce locally with npm test and npm run benchmark</span><span>08 / 12</span></div>
+</section>
+<section class="slide" aria-label="Slide 9: Boundaries">
+<div class="top"><span class="brand">OpenAIBOM</span><span>Scope and trust</span></div>
+<h2>Useful evidence. Explicit limits.</h2>
+<div class="grid two" style="margin-top:28px">
+<div class="card"><h3>What the prototype establishes</h3><ul class="list"><li>Observed references in supported syntax.</li><li>Declared package metadata and exact npm lock entries.</li><li>Policy matches and unresolved coverage.</li><li>Identity of selected input contents through hashes.</li><li>Differences between same-project reports.</li></ul></div>
+<div class="card"><h3>What it does not establish</h3><ul class="list"><li>Real vulnerability-feed coverage or verified upstream licenses.</li><li>Training-data lineage or trusted model origin.</li><li>Scope-sensitive data flow or runtime reachability.</li><li>Model fairness, hallucination or prompt-injection resistance.</li><li>Signed attestations or SPDX / CycloneDX compliance.</li></ul></div>
+</div>
+<p class="footnote">Input hashes are unsigned, not provenance certificates. A finding can disappear because a file was removed or unparseable—check coverage before calling it fixed.</p>
+<div class="footer"><span>A pass is bounded to supported checks—not universal safety</span><span>09 / 12</span></div>
+</section>
+<section class="slide" aria-label="Slide 10: Hosting and demo delivery">
+<div class="top"><span class="brand">OpenAIBOM</span><span>Presentation and deployment</span></div>
+<h2>Render-ready. Samples and visitor uploads.</h2>
+<p class="lead">One Node web service. No database, API key or paid model service required.</p>
+<div class="grid three">
+<div class="card"><span class="number">BUNDLED DEMONSTRATION</span><h3>Try without uploading</h3><p>Run risky and fixed samples, compare findings and inspect the benchmark. No visitor source is needed.</p></div>
+<div class="card"><span class="number">CONSENT-GATED UPLOADS</span><h3>Inspect your own project</h3><p>Public mode discloses server-side processing before upload. Source stays in application memory and is never executed.</p></div>
+<div class="card"><span class="number">BOUNDED PUBLIC SERVICE</span><h3>Controls, not a guarantee</h3><p>Host and origin checks, upload and rate limits, two concurrent scans and a 10-second worker deadline.</p></div>
+</div>
+<div class="band"><strong>Privacy:</strong> never upload secrets or confidential source. Consent is not authentication; the hosting provider may retain request metadata.</div>
+<p class="footnote">Prepared and locally tested; no live deployment claimed. Render Free may sleep and cold-start. Publish the repository, then deploy its Blueprint.</p>
+<div class="footer"><span>Local + public modes implemented · Deployment pending</span><span>10 / 12</span></div>
+</section>
+<section class="slide" aria-label="Slide 11: Future roadmap">
+<div class="top"><span class="brand">OpenAIBOM</span><span>Future ideas · not yet implemented</span></div>
+<h2>Grow depth before claiming broader coverage.</h2>
+<p class="lead">A staged roadmap from hackathon prototype to more useful engineering tooling.</p>
+<div class="grid three">
+<div class="card"><span class="number">NEXT / ACCESS + INTEROPERABILITY</span><h3>Make it easier to adopt</h3><ul class="list"><li>Authentication and edge abuse controls.</li><li>Standards-aligned AIBOM export.</li><li>Python lockfile support.</li><li>Reusable CI integration templates.</li></ul></div>
+<div class="card"><span class="number">THEN / COVERAGE + EVIDENCE</span><h3>Improve analysis depth</h3><ul class="list"><li>Opt-in real advisory sources.</li><li>Verified upstream metadata.</li><li>Scope-aware binding and data flow.</li><li>Independent repository evaluation.</li></ul></div>
+<div class="card"><span class="number">LATER / TRUST + WORKFLOWS</span><h3>Connect review to release</h3><ul class="list"><li>Artifact provenance verification.</li><li>Signed report attestations.</li><li>Policy exceptions with audit trails.</li><li>Link separate runtime evaluation results.</li></ul></div>
+</div>
+<div class="footer"><span>Proposed directions, not committed delivery dates</span><span>11 / 12</span></div>
+</section>
+<section class="slide hero" aria-label="Slide 12: Closing">
+<div class="top"><span class="brand">OpenAIBOM</span><span>Open source · MIT</span></div>
+<p class="eyebrow">The project in one sentence</p>
+<h2 class="closing">Make AI dependencies visible,<br>review decisions explainable,<br>and changes measurable.</h2>
+<p class="lead" style="margin-top:28px">A working, offline foundation for evidence-led AI supply-chain review.</p>
+<div class="band"><strong>See it work:</strong> Risky sample → Fixed sample → Benchmark → Export</div>
+<p class="footnote">Local demo: <a href="http://127.0.0.1:4317/">http://127.0.0.1:4317/</a> · Setup and scope: <a href="../README.md">project README</a><br>The local URL works only on the machine running the application. No public deployment is linked.</p>
+<div class="footer"><span>OpenAIBOM v0.2 · Hackathon presentation</span><span>12 / 12</span></div>
+</section>
+</main>
+</body>
+</html>

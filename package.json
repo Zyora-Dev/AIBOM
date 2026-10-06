@@ -1,0 +1,20 @@
+{
+  "name": "openaibom",
+  "version": "0.2.0",
+  "private": true,
+  "license": "MIT",
+  "description": "Local-first AI component inventory for a hackathon demo",
+  "type": "module",
+  "engines": { "node": ">=22" },
+  "scripts": {
+    "start": "node server.js",
+    "test": "node --test",
+    "benchmark": "node cli.js benchmark",
+    "scan": "node cli.js scan",
+    "check": "node --check server.js && node --check lib/scanner.js && node --check lib/source-analysis.js && node --check lib/risk-engine.js && node --check lib/hosted-analysis.js && node --check lib/analysis-worker.js && node --check cli.js && node --check public/app.js"
+  },
+  "dependencies": {
+    "@babel/parser": "^7.28.0",
+    "@lezer/python": "^1.1.18"
+  }
+}
